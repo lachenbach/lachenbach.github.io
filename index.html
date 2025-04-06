@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liam Achenbach - Robotics Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">Liam Achenbach</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#publications">Publications</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#tutorials">Tutorials</a></li>
+            </ul>
+            <button id="theme-toggle" aria-label="Toggle dark mode">🌓</button>
+        </div>
+    </nav>
+
+    <section id="hero" class="hero-section">
+        <div class="video-container">
+            <video autoplay muted loop playsinline preload="auto" poster="assets/panda_wrist_wave_poster.jpg" style="background-color: #000;">
+                <source src="assets/arm_waving.mp4" type="video/mp4">
+            </video>
+            <img src="assets/panda_wrist_wave_poster.jpg" alt="Panda wrist wave" class="video-fallback fallback-image">
+            <div class="video-overlay">
+                <h1 class="greeting">Hi there! 👋</h1>
+                <div class="arm-pointer">
+                    <svg class="arrow" width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4L4 12L12 20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 12H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p class="pointer-text">This will get a hand as soon as ours is public</p>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll Down</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7"/>
+            </svg>
+        </div>
+    </section>
+
+    <main>
+        <section id="home" class="section">
+            <div class="container">
+                <div class="home-content">
+                    <div class="profile">
+                        <img src="assets/Standard_picture.jpg" alt="Liam Achenbach" class="profile-image">
+                        <h1>Liam Achenbach</h1>
+                        <h2>Robotics MSc Student at ETH Zurich</h2>
+                        <p>Thinking about how machines should perceive and interact with the world.<br>Working on equipping robots with a brain.</p>
+                        <div class="social-links">
+                            <!-- <a href="https://github.com/liamachenbach" target="_blank">GitHub</a> -->
+                            <a href="https://www.linkedin.com/in/liam-achenbach-341188199/" target="_blank">LinkedIn</a>
+                        </div>
+                    </div>
+                    <div class="coming-up">
+                        <h2 class="coming-up-title">Coming Up</h2>
+                        <div class="event-card">
+                            <div class="event-header">
+                                <div class="event-date">
+                                    <span class="event-month">APR</span>
+                                    <span class="event-day">11</span>
+                                </div>
+                                <div class="event-title">
+                                    <h3>Mistral AI Robotics Hackathon</h3>
+                                    <p class="event-time">April 11-13, 2025 • Paris, France</p>
+                                </div>
+                            </div>
+                            <div class="event-details">
+                                <p>I'm heading to the Mistral AI Robotics Hackathon in Paris. Let's chat if you're there!</p>
+                                <a href="#" class="event-link">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section">
+            <div class="container">
+                <h2>Projects</h2>
+                
+                <h3 class="project-subsection-title">Currently Working On</h3>
+                <div class="project-grid">
+                    <div class="project-card">
+                        <h3>ANYmal Navigation</h3>
+                        <div class="project-image-container">
+                            <div class="project-image">
+                                <img src="assets/anymal.png" alt="ANYmal Robot" class="project-img">
+                            </div>
+                            <p class="project-caption">ANYmal — Quadrupedal Robot</p>
+                        </div>
+                        <p>Help ANYmal know where to go with VLMs, LiDAR and classical computer vision.</p>
+                    </div>
+                    <div class="project-card">
+                        <h3>Bimanual Manipulation</h3>
+                        <div class="project-image-container">
+                            <div class="project-image">
+                                <img src="assets/galaxea.png" alt="Bimanual Robotic Hands" class="project-img">
+                            </div>
+                            <p class="project-caption">Packing task - Galaxea humanoid</p>
+                        </div>
+                        <p>Build humanoid control ready for industrial tasks using VLAs and diffusion policies. </p>
+                    </div>
+                    <div class="project-card">
+                        <h3>EduReach</h3>
+                        <div class="project-image-container">
+                            <div class="project-image">
+                                <img src="assets/so100.png" alt="SO-100 Robotic Arm" class="project-img">
+                            </div>
+                            <p class="project-caption">SO-100 — Open Source Arm</p>
+                        </div>
+                        <p>Fine-tuning VLAs for SO-100 robotic arm. Developing educational applications for robotic manipulation.</p>
+                    </div>
+                </div>
+                
+                <h3 class="project-subsection-title">Past Projects</h3>
+                <div class="project-grid">
+                    <div class="project-card">
+                        <h3>Dexterous Manipulation</h3>
+                        <div class="project-image-container">
+                            <div class="project-image">
+                                <img src="assets/hand.png" alt="Robotic Hand" class="project-img">
+                            </div>
+                            <p class="project-caption"> Hand on franka arm</p>
+                        </div>
+                        <p>Reinforcement Learning (PPO) for stable grasps, imitation learning for manipulation. VLM/VLAs for planning and manipulation.</p>
+                        <div class="video-link-container">
+                            <a href="#" class="video-link">
+                                <span class="video-icon">📄</span>
+                                <span>Preprint coming soon</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <h3>NASA JPL SWIM Project</h3>
+                        <div class="project-image-container">
+                            <div class="project-image">
+                                <img src="assets/europa_with_swim.png" alt="Europa moon" class="project-img">
+                            </div>
+                            <p class="project-caption">Europa and SWIM drone</p>
+                        </div>
+                        <p>Underwater robotic swarms for exploration of Jupiter's moon Europa.</p>
+                        <div class="video-link-container">
+                            <a href="https://www.youtube.com/watch?v=sz0SWy7bCzU" target="_blank" class="video-link">
+                                <span class="video-icon">▶</span>
+                                <span>Spot me on NASA JPL Channel</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <h3>Microrobot Control with RL</h3>
+                        <div class="project-image-container">
+                            <div class="project-image">
+                                <img src="assets/microbots.png" alt="Microrobot Control" class="project-img">
+                            </div>
+                            <p class="project-caption">Microrobot trying to find the way</p>
+                        </div>
+                        <p>Reinforcement Learning (DreamerV3, PPO) for control of Microrobots through the brain. State estimation with computer vision and SAM-segmentation.</p>
+                        <div class="video-link-container">
+                            <a href="https://www.biorxiv.org/content/10.1101/2024.09.28.615576v1" target="_blank" class="video-link">
+                                <span class="video-icon">📄</span>
+                                <span>View Preprint</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <h3>Visual Odometry</h3>
+                        <div class="vo-container">
+                            <div class="vo-image">
+                                <img src="assets/VO.png" alt="Visual Odometry Pipeline" class="vo-image">
+                            </div>
+                            <p class="vo-caption">Car finding out where it is</p>
+                        </div>
+                        <p>Visual odometry pipeline using classical computer vision (feature-based). Works on KITTI, Malaga, and parking.</p>
+                        <div class="video-link-container">
+                            <a href="https://www.youtube.com/playlist?list=PLYPB14LfGrkPhpV88stzWYthXyCQFvqRH" target="_blank" class="video-link">
+                                <span class="video-icon">▶</span>
+                                <span>Watch Demo Videos</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <h3>NAUTILUS</h3>
+                        <div class="glider-container">
+                            <div class="glider">
+                                <img src="assets/nautilus.png" alt="NAUTILUS Glider" class="glider-image">
+                            </div>
+                            <p class="glider-caption">Glider to search the arctic</p>
+                        </div>
+                        <p>Project Manager and Systems Engineer for NAUTILUS, an minimally-invasive autonomous underwater glider designed for polar research.</p>
+                        <div class="project-link-container">
+                            <a href="https://aris-space.ch/our-projects/nautilus/" target="_blank" class="project-link">
+                                <span class="project-icon">🔗</span>
+                                <span>Project Website</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="publications" class="section">
+            <div class="container">
+                <h2>Publications</h2>
+                <div class="publications-list">
+                    <div class="publication">
+                        <h3>ICRA 2025 WBCD Challenge</h3>
+                        <p class="authors">L. Achenbach, ETH Zurich Team</p>
+                        <p class="venue">IEEE ICRA, 19-23 May 2025, Atlanta, USA</p>
+                        <p class="challenge-description">Participating in the "What Bimanual Teleoperation and Learning from Demonstration Can Do (WBCD)" challenge.</p>
+                        <a href="https://wbcdcompetition.github.io" target="_blank" class="paper-link">Challenge Website</a>
+                    </div>
+                    <div class="publication">
+                        <h3>Enhancing Robotic Grasping with Custom-Built Hand and Reinforcement Learning</h3>
+                        <p class="authors">The authors (including me of course)</p>
+                        <p class="venue">Submitted to IEEE IROS 2025</p>
+                        <p class="publication-description">Developing a custom robotic hand and implementing reinforcement learning techniques to improve grasping capabilities and manipulation tasks.</p>
+                        <a href="#" class="paper-link">Preprint coming soon</a>
+                    </div>
+                    <div class="publication">
+                        <h3>Model-Based Reinforcement Learning for Ultrasound-Driven Autonomous Microrobots</h3>
+                        <p class="authors">M. Medany, L. Piglia, L. Achenbach, S. Mukkavilli, D. Ahmed</p>
+                        <p class="venue">Preprint</p>
+                        <a href="https://www.biorxiv.org/content/10.1101/2024.09.28.615576v1" class="paper-link">View Paper</a>
+                    </div>
+                    <div class="publication">
+                        <h3>A Soft Robotic Morphing Wing for Unmanned Underwater Vehicles</h3>
+                        <p class="authors">A. Giordano, L. Achenbach, D. Lenggenhager, F. Wiesemüller et al.</p>
+                        <p class="venue">Advanced Intelligent Systems</p>
+                        <a href="https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/aisy.202300702" class="paper-link">View Paper</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="section">
+            <div class="container">
+                <h2>Applied Robotics Experience</h2>
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <h3>Modeling and Simulation</h3>
+                        <p>Mujoco, Isaac gym, forward/inverse kinematics, dynamics, CAD, FEM, CFD</p>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Robot Learning</h3>
+                        <p>VLAs, Deep Reinforcement Learning (PPO, DreamerV3), Imitation Learning (ACT), Building RL environments (Mujoco, Isaacgym), Distributed training</p>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Perception</h3>
+                        <p>Classical computer vision (feature detection, matching, VIO), Deep Learning based (CNNs, semantic segmentation and depth prediction, transformer-based networks, VLMs), LiDAR (PointNets, autonomous driving setting)</p>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Control Systems</h3>
+                        <p>PID, LQR, state estimation, path planning (A*, RRT*)</p>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Hardware</h3>
+                        <p>3D printing (SLA, FDM), IMUs, flight computers, servos and motors</p>
+                    </div>
+                    <div class="skill-category">
+                        <h3>Programming</h3>
+                        <p>C/C++, Python, PyTorch, ROS2, Matlab, MAVLINK</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tutorials" class="section">
+            <div class="container">
+                <h2>Tutorials</h2>
+                <div class="tutorials-grid">
+                    <div class="tutorial-card">
+                        <div class="tutorial-image-container">
+                            <img src="assets/mujoco_tutorial.png" alt="Mujoco Hand Tutorial" class="tutorial-image">
+                            <div class="work-in-progress-badge">Work in Progress</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2024 Liam Achenbach. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 
