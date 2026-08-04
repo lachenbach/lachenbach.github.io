@@ -347,6 +347,18 @@ h2 {
     margin-bottom: 6px;
 }
 
+.experience-page .finds-note,
+.experience-page .finds-entry-list p {
+    color: hsl(73 32% 28%);
+}
+
+.experience-page .social-row a,
+.experience-page .finds-entry-list a {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+}
+
 @media (max-width: 900px) {
     .site-header,
     .wave-lockup {
