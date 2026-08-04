@@ -1,4 +1,6 @@
 *.DS_Store
 *.md
+!posts/
+!posts/*.md
 dist/
 node_modules/

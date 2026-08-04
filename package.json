@@ -4,14 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "posts:build": "node scripts/build-posts.mjs",
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run posts:build && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
     "vite": "^5.0.0"
   },
   "dependencies": {
-    "@google/model-viewer": "^3.4.0"
+    "@google/model-viewer": "^3.4.0",
+    "marked": "^18.0.9"
   }
-} 
+}
