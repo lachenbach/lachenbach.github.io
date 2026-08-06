@@ -41,28 +41,13 @@ function parseFrontMatter(source, filename) {
         metadata[key] = rawValue.replace(/^(["'])(.*)\1$/, "$2");
     }
 
-    for (const key of ["title", "description", "date", "kicker", "status"]) {
+    for (const key of ["title", "description", "date"]) {
         if (!metadata[key]) {
             throw new Error(`${filename} is missing required front matter: ${key}`);
         }
     }
 
     return { metadata, body: match[2] };
-}
-
-function formatDate(isoDate) {
-    const date = new Date(`${isoDate}T12:00:00Z`);
-
-    if (Number.isNaN(date.valueOf())) {
-        throw new Error(`Invalid date: ${isoDate}. Use YYYY-MM-DD.`);
-    }
-
-    return new Intl.DateTimeFormat("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-        timeZone: "UTC"
-    }).format(date);
 }
 
 function protectDelimitedMath(source, opening, closing, tokens) {
@@ -114,8 +99,6 @@ const mathJaxScript = String.raw`    <script>
 function renderPostPage(post) {
     const title = escapeHtml(post.title);
     const description = escapeHtml(post.description);
-    const kicker = escapeHtml(post.kicker);
-    const status = escapeHtml(post.status);
 
     return `<!DOCTYPE html>
 <html lang="en">
@@ -134,7 +117,7 @@ ${mathJaxScript}
     <div class="page-shell">
         <header class="site-header">
             <div class="brand-group">
-                <a class="brand" href="index.html">LiamLog</a>
+                <a class="brand" href="index.html">Liam</a>
                 <span class="brand-meta">73|76</span>
             </div>
 
@@ -147,9 +130,7 @@ ${mathJaxScript}
 
         <main class="content">
             <article class="blog-post">
-                <p class="section-kicker">${kicker}</p>
                 <h1>${title}</h1>
-                <p class="post-meta">${post.displayDate} | ${status}</p>
 
                 <div class="blog-body">
 ${post.htmlBody.trim().split("\n").map((line) => `                    ${line}`).join("\n")}
@@ -186,8 +167,8 @@ async function loadPosts() {
 
         return {
             ...metadata,
+            isDraft: metadata.draft?.toLowerCase() === "true",
             slug,
-            displayDate: formatDate(metadata.date),
             htmlBody: renderMarkdown(body)
         };
     }));
@@ -197,8 +178,9 @@ async function loadPosts() {
 
 async function buildPosts() {
     const posts = await loadPosts();
+    const publishedPosts = posts.filter((post) => !post.isDraft);
     const homepage = await readFile(homepagePath, "utf8");
-    const cards = posts.map(renderPostCard).join("\n");
+    const cards = publishedPosts.map(renderPostCard).join("\n");
     const updatedHomepage = homepage.replace(
         /<!-- POSTS:START -->[\s\S]*?<!-- POSTS:END -->/,
         `<!-- POSTS:START -->\n${cards}\n                <!-- POSTS:END -->`
@@ -216,7 +198,11 @@ async function buildPosts() {
         ))
     ]);
 
-    console.log(`Built ${posts.length} post${posts.length === 1 ? "" : "s"}.`);
+    const draftCount = posts.length - publishedPosts.length;
+    console.log(
+        `Built ${posts.length} post${posts.length === 1 ? "" : "s"} ` +
+        `(${publishedPosts.length} published, ${draftCount} draft${draftCount === 1 ? "" : "s"}).`
+    );
 }
 
 buildPosts().catch((error) => {

@@ -375,6 +375,29 @@ h2 {
     background: hsl(73 30% 88%);
 }
 
+.blog-body table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    line-height: 1.55;
+}
+
+.blog-body th,
+.blog-body td {
+    padding: 12px 14px;
+    border: 1px solid var(--ink);
+    text-align: left;
+    vertical-align: top;
+}
+
+.blog-body th {
+    color: var(--ink);
+    font-weight: 700;
+}
+
 .finds-intro {
     margin-bottom: 18px;
 }

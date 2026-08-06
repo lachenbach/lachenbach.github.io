@@ -9,10 +9,17 @@ Start every post with this front matter:
 title: Pretraining on egocentric data
 description: One or two sentences shown on the Posts page.
 date: 2026-08-04
-kicker: Notes
-status: draft
+draft: true
 ---
 ```
+
+Set `draft: true` while a post is in progress. Drafts are still generated so you can
+preview them at their direct `.html` URL, but they are omitted from the Posts page.
+Remove the line (or set it to `false`) when the post is ready to publish.
+
+This is not access control: anyone who knows a draft's URL can still open it. A real
+password-protected post requires authentication on the hosting platform; hiding it
+with browser-side JavaScript would expose both the post and the password.
 
 The title is rendered automatically, so begin the article itself with `##` for its first section heading.
 

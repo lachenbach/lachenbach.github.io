@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Assessing the current state.">
+    <title>Liam | Egocentric Pretraining for Robot Foundation Models</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [["\\(", "\\)"]],
+                displayMath: [["\\[", "\\]"]]
+            }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="page-shell">
+        <header class="site-header">
+            <div class="brand-group">
+                <a class="brand" href="index.html">Liam</a>
+                <span class="brand-meta">73|76</span>
+            </div>
+
+            <nav class="site-nav" aria-label="Primary navigation">
+                <a class="is-active" href="index.html">Posts</a>
+                <a href="finds.html">Finds</a>
+                <a href="experience.html">Experience</a>
+            </nav>
+        </header>
+
+        <main class="content">
+            <article class="blog-post">
+                <h1>Egocentric Pretraining for Robot Foundation Models</h1>
+
+                <div class="blog-body">
+                    <p>In robot learning today </p>
+                    <h2>The challenges</h2>
+                    <ol>
+                    <li>Human demonstrations are different from robot trajectories in speed and manipulation strategy, which the robot might not be able to perform due to kinematic limitations.</li>
+                    <li>If you&#39;re training a VLA or similar policy, you&#39;ll have to extract actions from human video and account for the resulting embodiment gap.</li>
+                    <li>Human hand tracking is often recorded with respect to the camera mounted on the head, which is not static as it is for many bimanual robots.</li>
+                    <li>In theory there should be a lot of egocentric data, but in practice there is a limited amount of open source data.</li>
+                    <li></li>
+                    </ol>
+                    <h2>Publicly available egocentric datasets</h2>
+                    <table>
+                    <thead>
+                    <tr>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Task Diversity</th>
+                    <th>Scene Diversity</th>
+                    </tr>
+                    </thead>
+                    <tbody><tr>
+                    <td>EgoVerse-A*</td>
+                    <td>152h</td>
+                    <td>3 Single-arm, 3 Bimanual tasks</td>
+                    <td>varies with task</td>
+                    </tr>
+                    <tr>
+                    <td>EgoVerse-I*</td>
+                    <td>3192h</td>
+                    <td>&gt;2000 tasks</td>
+                    <td>&gt;240 scenes, &gt;2100 demonstrators</td>
+                    </tr>
+                    <tr>
+                    <td>EgoDex</td>
+                    <td>829h</td>
+                    <td>194 tasks</td>
+                    <td></td>
+                    </tr>
+                    </tbody></table>
+                    <ul>
+                    <li>EgoVerse is split into 6 flagship tasks which make up an EgoVerse-A(cademic) and an EgoVerse-I(industry) split, where the latter has more diverse tasks. The flagship tasks are object-in-container (14.38h), cup-on-saucer (28.90h), bag-grocery (6.78h), fold-clothes (82.96h), scoop-granular (11.13h), sort-utensils (7.67h). The paper reports 75h of human data collected by academic labs, but it seems like industry partners added more flagship data since the release of the paper. Originally, the paper reported 1400h of human data in the I-split which now has grown to around 3200h of data. I did not check the updated task count and diversity but presumably those also grew.</li>
+                    </ul>
+                    <h3>Data quality and samples</h3>
+                    <p>Below are some samples of egocentric data from EgoVerse. You will notice that there is no standardized understanding of how to collect this data, so even within one dataset, operators and contributors choose different collection strategies.</p>
+                    <h2>Learning policies from egocentric data</h2>
+                    <table>
+                    <thead>
+                    <tr>
+                    <th>Paper</th>
+                    <th align="right">Human Dataset (h)</th>
+                    <th align="right">Robot Dataset (h)</th>
+                    <th>Dataset Availability</th>
+                    <th>Target Embodiment</th>
+                    <th>Insight</th>
+                    </tr>
+                    </thead>
+                    <tbody><tr>
+                    <td>EgoScale</td>
+                    <td align="right">20.000</td>
+                    <td align="right">4</td>
+                    <td>private</td>
+                    <td>GalaxeaR1Pro, G1</td>
+                    <td>More human data leads to higher gains for single task post-training</td>
+                    </tr>
+                    <tr>
+                    <td>S. Kareers Pi Project</td>
+                    <td align="right">3-5</td>
+                    <td align="right">?</td>
+                    <td>private</td>
+                    <td>ARX</td>
+                    <td>Human data is useful if VLA pretraining diversity is scaled</td>
+                    </tr>
+                    </tbody></table>
+                </div>
+            </article>
+        </main>
+    </div>
+</body>
+</html>
