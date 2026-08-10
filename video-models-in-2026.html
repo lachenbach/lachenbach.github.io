@@ -97,14 +97,14 @@
                     <td>Yes</td>
                     <td>..</td>
                     <td>..</td>
-                    <td></td>
+                    <td><a href="https://arxiv.org/pdf/2601.03233">https://arxiv.org/pdf/2601.03233</a></td>
                     </tr>
                     <tr>
                     <td>Helios</td>
                     <td>?</td>
                     <td>..</td>
-                    <td></td>
-                    <td></td>
+                    <td>..</td>
+                    <td><a href="https://arxiv.org/pdf/2603.04379">https://arxiv.org/pdf/2603.04379</a></td>
                     </tr>
                     <tr>
                     <td>MagI-1</td>
@@ -136,32 +136,27 @@
                     </tr>
                     </tbody></table>
                     <h2>Data</h2>
-                    <h3>Sources</h3>
+                    <p>Modern technical reports on video models disclose a fair amount about their data preprocessing pipelines but rarely disclose their data sources.</p>
+                    <p>| Model | Pretraining dataset size images | Pretraining dataset size video |
+                    |---|---|---|---|
+                    | Huanyuan 1.5 |  |5B | 800 million video segments? |</p>
                     <h3>Preprocessing Videodata</h3>
                     <p>Constructing a pretraining video dataset naturally involves challenges unique to the modality. Since modern video model training often starts with training an image-generation model, data preparation also has to be done for the image datasets. For now, we&#39;re just touching on video preprocessing steps.</p>
                     <p><strong>Shot detection:</strong> One video might show multiple completely different shots (scene change in a movie), which need to be split into seperate clips. Shot detection is a well studied problem and learned approaches like TransNetV2 seem to perform sufficiently well.</p>
                     <p><strong>Transcoding:</strong> The videos from your large corpus will probably have different formats (H.264, H.265, AV1, etc.), GOP structures, bitrates, etc. One would align these into one format to avoid processing errors in the preprocessing pipeline. The importance of choosing GPUs with the right accelerators (L40S has both NVDEC and NVENC, while H100 only has NVDEC) is well described in the cosmos-predict-1 paper.</p>
                     <p><strong>Visual Quality Filtering:</strong> Removing video with static scenes, abrupt camera movement can be achieved by training small classifiers/scorers [1, 5]. Clustering the dataset before training the scorer avoids scoring long tails of the dataset as &quot;poor&quot; [5].  </p>
                     <p><strong>Motion Quality Filtering:</strong> Removing blur, motion jitter, noise and other artifacts can also be done using lightweight classifiers trained on human-rated videos like DOVER. One can further classify videos into more static scenes (landscape, interviews, etc.) and reduce their sampling ratio during training [5].</p>
-                    <p><strong>Additional Filtering:</strong> Cosmos-predict series, focused on physical understanding, removes videos with text overlay. When building a &quot;physically plausible video model&quot;, it&#39;s also advisable to remove any video game footage etc. Semantic artifact filtering like VTSS can also be applied. One may use a VLM to futher remove unwanted clips. Remove padding borders, grid layouts, etc. [4]. Naturally, too short video clips are filtered. Synthetic video detection and removal.</p>
-                    <p><strong>Annotation:</strong> DALL-E3 shows that visual generation quality can be improved by highky descriptive captions [5]. The VLMs used as captioning models are asked to provide extensive captions which describe the semantics of the scene and movements involved to achieve that effect. Prompts can be produced in different lengths, which will enable different use cases downstream [1]. One challenge in captioning is, that efforts to write more detailed prompts for the video model can lead to an increased hallucination rate [4]. There&#39;s an interesting OPA-DPO approach in [4], however, it&#39;s not immediately clear how effective it is.</p>
-                    <p><strong>Deduplication:</strong> One can use video embeddings (like InternVideo2) and perform deduplication DataComp-style [1]. A library to do these searches is Milvus [2].</p>
-                    <h3>Data sources</h3>
-                    <table>
-                    <thead>
-                    <tr>
-                    <th>Model</th>
-                    <th>Pretraining dataset size images</th>
-                    <th>Pretraining dataset size video</th>
-                    </tr>
-                    </thead>
-                    <tbody><tr>
-                    <td>Huanyuan 1.5</td>
-                    <td>5B</td>
-                    <td>800 million video segments?</td>
-                    </tr>
-                    </tbody></table>
-                    <h2>Going from Video to Latents</h2>
+                    <p><strong>Additional Filtering:</strong> Cosmos-predict series, focused on physical understanding, removes videos with text overlay. When building a &quot;physically plausible video model&quot;, it&#39;s also advisable to remove any video game footage etc. Semantic artifact filtering like VTSS can also be applied. One may use a VLM to futher remove unwanted clips. Remove black/padding borders (ffmpeg cropdetect), grid layouts, etc. [4]. Naturally, too short video clips are filtered. Synthetic video detection and removal.</p>
+                    <p><strong>Annotation:</strong> DALL-E3 shows that visual generation quality can be improved by highky descriptive captions [5]. The VLMs used as captioning models are asked to provide extensive captions which describe the semantics of the scene and movements involved to achieve that effect. Prompts can be produced in different lengths, which will enable different use cases downstream [1]. One challenge in captioning is, that efforts to write more detailed prompts for the video model can lead to an increased hallucination rate [4]. There&#39;s an interesting OPA-DPO approach in [4], however, it&#39;s not immediately clear how effective it is. The only benefit I see with training your own captioning model as done in [5] is the camera angle prediction.</p>
+                    <p><strong>Deduplication:</strong> One can use video embeddings (like InternVideo2, Cosmos-Embed1-448p) and perform deduplication DataComp-style [1,3]. Due to the scale, one will need to cluster and then identify the near-duplicates. A library to do these searches is Milvus used in [2].</p>
+                    <p><strong>Sampling/curriculum:</strong> The highest quality video data should naturally be retained for the later stages of training. In Wan2.1 post-training they select this data as a mixture of the highest scores given by all the quality classifiers and human manual judgement. Cosmos-3 additionally injects synthetic images and videos into the mid-training mix. Their synthetic datasets target simulated physics, robots, driving, humans?, and warehouse footage. </p>
+                    <h2>VAEs - Going from Video to Latents</h2>
+                    <h3>Challenges</h3>
+                    <ol>
+                    <li>Capturing both spatial and temporal features</li>
+                    <li></li>
+                    </ol>
+                    <h3>Existing Tokenizers</h3>
                     <h2>Architectures</h2>
                     <h2>Training</h2>
                     <p>[1] cosmos predict 1

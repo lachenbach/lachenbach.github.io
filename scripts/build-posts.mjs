@@ -144,10 +144,10 @@ ${post.htmlBody.trim().split("\n").map((line) => `                    ${line}`).
 }
 
 function renderPostCard(post) {
-    return `                <a class="post-card post-link" href="${post.slug}.html">
-                    <h2>${escapeHtml(post.title)}</h2>
+    return `                <article class="post-card">
+                    <h2><a class="text-link" href="${post.slug}.html">${escapeHtml(post.title)}</a></h2>
                     <p>${escapeHtml(post.description)}</p>
-                </a>`;
+                </article>`;
 }
 
 async function loadPosts() {

@@ -51,6 +51,12 @@ a {
     text-decoration: none;
 }
 
+.text-link {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+}
+
 .page-shell {
     width: min(calc(100% - 40px), var(--max-width));
     margin: 0 auto;
@@ -239,17 +245,6 @@ h2 {
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
     background: linear-gradient(180deg, var(--card), var(--card-strong));
-}
-
-.post-link {
-    display: block;
-    transition: transform 160ms ease, border-color 160ms ease;
-}
-
-.post-link:hover,
-.post-link:focus-visible {
-    transform: translateY(-2px);
-    border-color: var(--line-strong);
 }
 
 .post-card p,
@@ -451,13 +446,6 @@ h2 {
 .experience-page .finds-note,
 .experience-page .finds-entry-list p {
     color: hsl(73 32% 28%);
-}
-
-.experience-page .social-row a,
-.experience-page .finds-entry-list a {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
 }
 
 @media (max-width: 900px) {
