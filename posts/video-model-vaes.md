@@ -1,6 +1,6 @@
 ---
-title: Latent Video Models in 2026
-description: Understanding current state and emerging trends.
+title: Video model VAEs for Robotics
+description: Current status of open source VAEs and their downsides.
 date: 2026-07-20
 draft: true
 ---
@@ -51,11 +51,11 @@ Constructing a pretraining video dataset naturally involves challenges unique to
 
 
 ## Tokenizers - Going from Video to Latents
-| Video Model | Video Tokenizer | Spatial Compression (H/s_HW x W/s_HW) | Temporal Compression | Compression speed | Latent dimension |
-|---|---|---|---|---|---|
-| Wan2.1 | Wan-VAE | .. | .. | .. |
-| Cosmos-predict2.5 | Wan-VAE | .. | .. | .. |
-| Cosmos-predict1 | Multiple self-trained | ... | ... | ... | 16 |
+| Video Tokenizer | Spatiotemporal Compression | Compression speed | Latent dimension |
+|---|---|---|---|
+| Wan-VAE | 1+4x8x8 | ... | 16 |
+| Cosmos-tokenizer-AE | 1+8x8x8 | ... | 16 |
+
 
 
 ## Notes:
@@ -63,10 +63,11 @@ Constructing a pretraining video dataset naturally involves challenges unique to
 ### General
 We do continuous tokenization because if we sample from a continuous distribution (like we do in flow-matching and diffusion) ... .
 
-### Cosmos-predict-1
-Here they trained their own tokenizers with different compression ratios. The tokenizers are temporally causal. Tokenizing the video stream in T_0 + T_1: enables training on images and video at the same time (an image is a one frame video). To reduce input size, they first perform a 2-level 3D wavelet transform, which downsamples along x,y,t by a factor of 4, leaving you with 4x4x4 downsampling. The rest of the structure is in the short code snippet, including the attention mechanism that captures long-range dependencies. Decoder is structured like the encoder just upsampling. They train it using alternating mini-batches of videos and images. Since this tokenizer is constructed as an AE there's no need for additional penalties (like KL) on the latent space, as for the VAE. During initial training they use L1 loss on pixels and the perceptual loss given by difference in VGG features. Second stage uses optical flow loss to handle temporal smoothness and Gram-matrix loss for reconstruction sharpness. In the finetuning stage, they additionally use adversarial loss to enhance reconstruction details, however, I didn't find this in the codebase. They offer 4x8x8, 8x8x8, and 8x16x16 compression.
+### Cosmos-predict-1 continuous AE
+Here they trained their own tokenizers with different compression ratios. The tokenizers are temporally causal. Tokenizing the video stream in T_0 + T_1: enables training on images and video at the same time (an image is a one frame video). To reduce input size, they first perform a 2-level 3D wavelet transform, which downsamples along x,y,t by a factor of 4, leaving you with 4x4x4 downsampling. The rest of the structure is in the short code snippet, including the attention mechanism that captures long-range dependencies. Decoder is structured like the encoder just upsampling. They train it using alternating mini-batches of videos and images. Since this tokenizer is constructed as an AE there's no need for additional penalties (like KL) on the latent space, as for the VAE. During initial training they use L1 loss on pixels and the perceptual loss given by difference in VGG features. Second stage uses optical flow loss to handle temporal smoothness and Gram-matrix loss for reconstruction sharpness. In the finetuning stage, they additionally use adversarial loss to enhance reconstruction details, however, I didn't find this in the codebase. They offer 4x8x8, 8x8x8, and 8x16x16 compression. A word of caution would be that the cosmos-series abandoned this tokenizer. The openness of the codebase and details in the technical report still make this interesting.
 
 ```python
+
 # 1. Hybrid 2x downsampling
 learned = CausalConv3d(C, C, kernel_size=(1, 3, 3), stride=2)(x)
 average = F.avg_pool3d(x, kernel_size=(1, 2, 2), stride=(1, 2, 2))
@@ -89,6 +90,10 @@ h = SpatialAttention(h) # each pixel attends to all HxW positions
 h = CausalTemporalAttention(h) # each time attends to times <= t
 h = ResBlock(h)
 ```
+
+### Wan-VAE
+
+
 
 
 ### Challenges
