@@ -9,7 +9,7 @@ This is a place where I document my learning about the topic. Naturally, you can
 
 ## Flow matching
 
-Sample from the data distribuition: \(x_0 \sim X_0\)
+Sample from the data distribution: \(x_0 \sim X_0\)
 Noise sample: \(x_1 \sim X_1\)
 Rectified flow: \(x_\tau = (1-\tau)x_0 + \tau x_1\)
 Flow matching timestep: \(\tau \in [0,1]\)
@@ -85,7 +85,7 @@ So the update objective combines the group-relative advantage \(\hat{A}^i\) with
 
 
 ## How to combine
-You can reformulate the flow-matching denoising process as an MDP, where \(t\) indexes the discrete MDP step and \(\tau_t\) is its continuous flow time. The state is \(s_t = (c, \tau_t, x_{\tau_t})\), including the context, flow time, and current point in the denoising process. The action is \(a_t = x_{\tau_{t+1}}\), the next more-denoised point on the trajectory. This makes the stochastic transition distribution parameterized by the flow \(v_\theta\) the policy to optimize. In flow matching, however, you will generally use deterministic samplers such as (insert the one that Wan uses) at inference time. As mentioned above, calculating \(r_t\) requires the ratio between the likelihood of an action under the new and old policies. Additionally, any RL algorithm needs sufficient exploration to reach strong policies (many sources, I could cite one here).
+You can reformulate the flow-matching denoising process as an MDP, where \(t\) indexes the discrete MDP step and \(\tau_t\) is its continuous flow time. The state is \(s_t = (c, \tau_t, x_{\tau_t})\), including the context, flow time, and current point in the denoising process. The action is \(a_t = x_{\tau_{t+1}}\), the next more-denoised point on the trajectory. This makes the stochastic transition distribution parameterized by the flow \(v_\theta\) the policy to optimize. In flow matching, however, you will generally use deterministic samplers such as the UniPC multistep solver at inference time. As mentioned above, calculating \(r_t\) requires the ratio between the likelihood of an action under the new and old policies. Additionally, any RL algorithm needs sufficient exploration to reach strong policies (many sources, I could cite one here).
 
 In Flow-GRPO the authors propose substituting the ODE at inference time with an SDE that matches the marginal probability density of the original ODE, meaning at a fixed noise level the distribution over particles is the same, while individual particles will naturally move differently due to the injected noise.
 
@@ -94,7 +94,7 @@ The basic Flow-ODE is
 d x_\tau = v_\tau(x_\tau)\,d\tau
 \]
 
-with inserterd SDE:
+with inserted SDE:
 \[
 d x_\tau
 =
@@ -108,11 +108,12 @@ v_\tau(x_\tau)
 g(\tau)\,dW_\tau
 \]
 
-Here you first add noise with \(g(\tau)\,dW_\tau\), giving you the desired randomness but spreading probability mass. You compensate for this using the score term, which points toward increasing probability density. This fits nicely with flow matching because
+Here you first add noise with \(g(\tau)\,dW_\tau\), giving you the desired randomness but spreading probability mass. You compensate for this using the score term, which points toward increasing probability density. Denoising integrates \(\tau: 1 \to 0\), so \(d\tau < 0\) and the minus sign puts that step along \(+\nabla_x \log p_\tau\). This fits nicely with flow matching because
 
 \[
 \log p_\tau(x_\tau \mid x_0)
 =
+\text{const}
 -\frac{\left\|x_\tau-(1-\tau)x_0\right\|_2^2}{2\tau^2},
 \qquad
 x_\tau \mid x_0 \sim \mathcal{N}\!\left((1-\tau)x_0,\tau^2I\right).
@@ -124,7 +125,7 @@ Using the interpolation equation gives
 \nabla_{x_\tau}\log p_\tau(x_\tau \mid x_0) = -\frac{x_1}{\tau}.
 \]
 
-We can marginalize over \(x_0\), discretize and obtain
+The interpolation also gives \(x_1 = x_\tau + (1-\tau)v\), which is what makes the score computable from \(v_\theta\). We can marginalize over \(x_0\), discretize and obtain
 
 \[
 x_{\tau+\Delta \tau}
@@ -176,6 +177,8 @@ D_{\mathrm{KL}}(\pi_\theta\|\pi_{\mathrm{ref}})
 }.
 \]
 
+In the repo this is off by default (\(\beta = 0\)).
+
 .
 
 There are further, interesting ablations in the Flow-GRPO paper that I recommend you checking out. It's especially interesting to look at the comparison with other alignment methods like Flow-DPO and online SFT. Here we want to further focus on Flow-GRPO.
@@ -201,7 +204,7 @@ for _, tau in enumerate(timesteps): # timesteps here are the amount of integrati
 ```
 
 
-We're looking at a code example from the Flow-GRPO github: https://github.com/yifan123/flow_grpo for SDE injection for WAN2.1. The variable names are changed since I hope that makes it easiert to understand.
+We're looking at a code example from the Flow-GRPO github: https://github.com/yifan123/flow_grpo for SDE injection for WAN2.1. The variable names are changed since I hope that makes it easier to understand.
 
 ```python
 
@@ -213,7 +216,10 @@ class SDEScheduler():
         
         d_tau = tau_next - tau
 
-        g_tau = tau_min + (tau_max - tau_min) * tau # discussed below
+        sigma_max = self.sigmas[1] # discussed below
+        sigma_min = self.sigmas[-1] # 0.0, the scheduler appends a zero terminal sigma
+
+        g_tau = sigma_min + (sigma_max - sigma_min) * tau
 
         mu_theta = (latent + (v_theta + g_tau**2 / (2 * tau) * (latent + (1 - tau) * v_theta))* d_tau)
         
@@ -232,10 +238,58 @@ class SDEScheduler():
 
 ```
 
-So this is basically exactly the implementation of what we derived above. If you've read closely  you'll find that g(tau) is just the linear interpolation here instead of the proposed a * sqrt(t/1-t). In the paper they argue that too low noise levels hamper exploration. The implementation in the paper differs from the one in the paper 
+So this is basically exactly the implementation of what we derived above. If you've read closely you'll find that g(tau) is just the linear interpolation here instead of the proposed a * sqrt(tau/(1-tau)). In the paper they argue that too low noise levels hamper exploration. The implementation in the repo differs from the one in the paper, as you can see in this plot:
+
+<figure>
+    <img src="assets/g-tau.svg" alt="Two noise schedules for the Flow-GRPO SDE plotted against flow time tau. Both start at zero, but the paper's square-root schedule rises much faster and leaves the top of the frame before tau reaches 0.75, while the Wan2.1 linear schedule climbs steadily to about 0.98 at tau equal to 1.">
+    <figcaption>
+        The paper's \(g(\tau) = a\sqrt{\tau/(1-\tau)}\) against the Wan2.1 path's
+        \(g(\tau) = \sigma_{\min} + (\sigma_{\max}-\sigma_{\min})\tau\). Both vanish as
+        \(\tau \to 0\), but at very different rates — \(\sqrt{\tau}\) against \(\tau\) — so the
+        square-root form injects far more noise into the late denoising steps, and it keeps more
+        everywhere else too, diverging as \(\tau \to 1\) where the linear one caps out just below 1.
+        Values are the defaults in the repo: \(a\) = <code>noise_level</code> = 0.7, and
+        \(\sigma_{\min} = 0\), \(\sigma_{\max} = 0.98\) read off the UniPC flow-sigma schedule at
+        <code>num_steps</code> = 20 with <code>flow_shift</code> = 3.0. Generated by
+        <code>scripts/plot_g_tau.py</code>.
+    </figcaption>
+</figure>
+
+What effects this has and what to best set here is an open question to me.
 
 ## Limitations for Flow-GRPO
 1. Speed: Injecting SDEs everywhere requires to store all the logprobs and training across the full trajectory. Flow-GRPO-Fast would be one approach to solve this by just injecting SDEs into less transitions. Diffusion-NFT (https://arxiv.org/abs/2509.16117) is also an interesting read about convergence speed.
 2. Memory overhead:
-3. Inference Sampler: Wan2.1 uses multi-step solvers like the FlowUniPCMultistepScheduler at inference time, which increases inference speed and quality but is not directly compatible with what we derived above. These multistep solvers use information from previous model evaluations to provide a higher-order update to the denoising path, while we above focused on the first order Euler-Maruyama sampling approach. Using a multistep solver also hurts the markovian assumption of the denoising path that we used above, since the update now additionally depends on previous states. If you want to have a fast sampler at inference time but still use Flow-GRPO first order discretisation for training, you need to be cautious of the train-inference mismatch you're introducing. 
+3. Inference Sampler: Wan2.1 uses multi-step solvers like the FlowUniPCMultistepScheduler at inference time, which increases inference speed and quality but is not directly compatible with what we derived above. These multistep solvers use information from previous model evaluations to provide a higher-order update to the denoising path, while we above focused on the first order Euler-Maruyama sampling approach. Using a multistep solver also hurts the Markovian assumption of the denoising path that we used above, since the update now additionally depends on previous states. If you want to have a fast sampler at inference time but still use Flow-GRPO first order discretisation for training, you need to be cautious of the train-inference mismatch you're introducing. 
 4. CFG stuff:
+5. Log-probability normalization:
+    For a \(D\)-dimensional latent transition, the exact joint Gaussian log-probability is
+
+    \[
+    \ell_\theta^{\mathrm{joint}}
+    =
+    \sum_{k=1}^{D}
+    \log \mathcal{N}
+    \left(
+    a_{t,k};\mu_{\theta,k},g(\tau)^2|\Delta \tau|
+    \right).
+    \]
+
+    The Wan implementation instead averages the elementwise log densities:
+
+    \[
+    \ell_\theta
+    =
+    \frac{1}{D}
+    \sum_{k=1}^{D}
+    \log \mathcal{N}
+    \left(
+    a_{t,k};\mu_{\theta,k},g(\tau)^2|\Delta \tau|
+    \right).
+    \]
+
+    It then computes \(r_t=\exp(\ell_\theta-\ell_{\mathrm{old}})\). This is the \(D\)-th root of the exact joint likelihood ratio, not the exact ratio itself. The same normalization appears in the practical KL through a mean-squared difference rather than a summed squared norm.
+
+    This normalization is understandable: video latents contain an enormous number of dimensions, so exact joint ratios would become numerically extreme after tiny changes in the transition mean. However, it means that the clipping range and KL coefficient are implementation-dependent and cannot be interpreted exactly as in low-dimensional PPO. They may also need to change with resolution, frame count, or latent representation.
+
+    Numerical consistency is especially difficult at low-noise steps, where the Gaussian variance becomes small. The Flow-GRPO authors explicitly note that recomputed log-probability errors are larger at low-noise steps and that Wan must use bfloat16 for model execution even though the transition calculations are converted to float32. Their implementation guidance discusses this issue here.
