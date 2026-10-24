@@ -145,8 +145,7 @@ ${post.htmlBody.trim()}
 
 function renderPostCard(post) {
     return `                <article class="post-card">
-                    <h2><a class="text-link" href="${post.slug}.html">${escapeHtml(post.title)}</a></h2>
-                    <p>${escapeHtml(post.description)}</p>
+                    <h2><a class="post-row-link" href="${post.slug}.html"><span>${escapeHtml(post.title)}</span></a></h2>
                 </article>`;
 }
 
