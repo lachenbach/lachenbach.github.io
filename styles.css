@@ -261,6 +261,13 @@ h2 {
     margin-bottom: 12px;
 }
 
+.post-card h2 {
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
+}
+
 .post-meta {
     margin-top: 22px;
     font-size: 0.93rem;
@@ -280,6 +287,13 @@ h2 {
     max-width: 760px;
 }
 
+.blog-post > h1 {
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+}
+
 .blog-body {
     display: grid;
     gap: 20px;
@@ -292,19 +306,24 @@ h2 {
     line-height: 1.8;
 }
 
-.blog-body h2,
-.blog-body h3 {
+.blog-body :is(h1, h2, h3, h4, h5, h6) {
     margin-top: 28px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
 }
 
+.blog-body h1,
 .blog-body h2 {
-    font-size: clamp(1.7rem, 3vw, 2.35rem);
-    line-height: 1.15;
+    font-size: clamp(1.3rem, 2.2vw, 1.5rem);
 }
 
 .blog-body h3 {
-    font-size: 1.25rem;
-    line-height: 1.3;
+    font-size: 1.2rem;
+}
+
+.blog-body :is(h4, h5, h6) {
+    font-size: 1.08rem;
 }
 
 .blog-body ul,
@@ -317,7 +336,9 @@ h2 {
     line-height: 1.7;
 }
 
-.blog-body a {
+.blog-post a,
+.post-card a,
+body:has(.blog-post) .site-header a {
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.18em;
@@ -341,6 +362,85 @@ h2 {
     font-family: "IBM Plex Mono", monospace;
     font-size: 0.84rem;
     line-height: 1.5;
+}
+
+.dancegrpo-panels {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.figure-credit {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.blog-body .dancegrpo-panels figure {
+    margin: 0;
+    align-content: start;
+}
+
+.dancegrpo-crop {
+    position: relative;
+    aspect-ratio: 560 / 524;
+    overflow: hidden;
+}
+
+.blog-body .dancegrpo-crop img {
+    position: absolute;
+    width: 365.7143%;
+    max-width: none;
+    height: auto;
+    top: -7.4427%;
+    border: 0;
+    border-radius: 0;
+}
+
+.dancegrpo-original img { left: -5.1786%; }
+.dancegrpo-hps img { left: -133.0357%; }
+.dancegrpo-clip img { left: -260.5357%; }
+
+.bavaria-panels,
+.bavaria-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.bavaria-panels {
+    gap: 24px;
+}
+
+.blog-body .bavaria-panels figure {
+    margin: 0;
+    align-content: start;
+}
+
+.bavaria-crop {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+}
+
+.blog-body .bavaria-crop img {
+    position: absolute;
+    width: 474.0741%;
+    max-width: none;
+    height: auto;
+    top: -36.5741%;
+    left: var(--crop-left);
+    border: 0;
+    border-radius: 0;
+}
+
+@media (max-width: 640px) {
+    .bavaria-panels,
+    .dancegrpo-panels {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
 }
 
 .blog-body blockquote {

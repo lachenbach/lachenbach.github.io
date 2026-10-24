@@ -133,7 +133,7 @@ ${mathJaxScript}
                 <h1>${title}</h1>
 
                 <div class="blog-body">
-${post.htmlBody.trim().split("\n").map((line) => `                    ${line}`).join("\n")}
+${post.htmlBody.trim()}
                 </div>
             </article>
         </main>

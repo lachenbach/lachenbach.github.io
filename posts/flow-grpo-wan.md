@@ -2,7 +2,7 @@
 title: GRPO on flow matching models
 description: Learning/Tutorial.
 date: 2026-07-20
-draft: true
+draft: false
 ---
 
 <figure id="flow-grpo-example" class="bavaria-comparison">
