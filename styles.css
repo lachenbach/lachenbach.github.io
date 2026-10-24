@@ -96,6 +96,12 @@ a {
 .brand-meta {
     color: var(--ink-soft);
     font-size: 1rem;
+    border: 0;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    min-width: 5ch;
+    text-align: left;
 }
 
 .site-nav {

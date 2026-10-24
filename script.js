@@ -1,5 +1,12 @@
 const robotArm = document.getElementById("robot-arm");
 
+document.querySelectorAll("button.brand-meta").forEach((button) => {
+    button.addEventListener("click", () => {
+        button.textContent = "I | L";
+        button.setAttribute("aria-label", "I L");
+    }, { once: true });
+});
+
 const frames = [
     [
         "    .----.            ",
