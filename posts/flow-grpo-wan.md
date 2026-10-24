@@ -5,9 +5,12 @@ date: 2026-07-20
 draft: true
 ---
 
-This is a place where I document my learning about the topic. Naturally, you can go and read the paper and implementations yourself.
+RL post-training of language models and agents has become extremely popular recently and has boosted model performance across a wide range of tasks like reasoning and coding. Naturally, if you're working with flow matching based models, you're probably wondering how you can apply these techniques to your model and whether or not it's worth it. 
+
+I'm curious about this myself so this is a place where I document my learning about the topic. Of course, you can go and read the paper and implementations yourself.
 
 ## Flow matching
+A short overview again on flow matching, we'll stick with this notation throughout the blog post. The core idea of flow matching is to learn a transform from noise to the clean data distribution. With sufficient training this can function as a generative model at inference, producing anything from images, AI-slop videos to robot actions. The flow matching inference process is a deterministic process, which will come back to bite us in a few paragraphs.
 
 Sample from the data distribution: \(x_0 \sim X_0\)
 Noise sample: \(x_1 \sim X_1\)
@@ -27,6 +30,7 @@ v - v_\theta(x_\tau,\tau)
 \]
 
 ## GRPO
+You're probably familiar with the Deepseek-R1 paper and how it introduced a way to train  
 For GRPO you can do G different rollouts and then calculate the group-relative advantage:
 \[
 \hat{A}^i
@@ -108,7 +112,7 @@ v_\tau(x_\tau)
 g(\tau)\,dW_\tau
 \]
 
-Here you first add noise with \(g(\tau)\,dW_\tau\), giving you the desired randomness but spreading probability mass. You compensate for this using the score term, which points toward increasing probability density. Denoising integrates \(\tau: 1 \to 0\), so \(d\tau < 0\) and the minus sign puts that step along \(+\nabla_x \log p_\tau\). This fits nicely with flow matching because
+Here you first add noise with \(g(\tau)\,dW_\tau\), giving you the desired randomness but spreading probability mass. You compensate for this using the score term, which points toward increasing probability density. Denoising integrates \(\tau: 1 \to 0\), so \(d\tau \lt 0\) and the minus sign puts that step along \(+\nabla_x \log p_\tau\). This fits nicely with flow matching because
 
 \[
 \log p_\tau(x_\tau \mid x_0)
@@ -181,13 +185,12 @@ In the repo this is off by default (\(\beta = 0\)).
 
 .
 
-There are further, interesting ablations in the Flow-GRPO paper that I recommend you checking out. It's especially interesting to look at the comparison with other alignment methods like Flow-DPO and online SFT. Here we want to further focus on Flow-GRPO.
+There are further, interesting ablations in the Flow-GRPO paper that I recommend you checking out. Here we want to further focus on Flow-GRPO.
 
 ## How to implement with Wan2.1
 I'm trying to use the same notation as above. 
 
-The normal Wan2.1 implementation (https://github.com/Wan-Video/Wan2.1/tree/main) does the following: 
-They use the FlowUniPCMultistepScheduler to integrate the ODE.
+The normal Wan2.1 implementation (https://github.com/Wan-Video/Wan2.1/tree/main) would do something like this: 
 
 ```python
 
@@ -204,7 +207,7 @@ for _, tau in enumerate(timesteps): # timesteps here are the amount of integrati
 ```
 
 
-We're looking at a code example from the Flow-GRPO github: https://github.com/yifan123/flow_grpo for SDE injection for WAN2.1. The variable names are changed since I hope that makes it easier to understand.
+We're looking at a code example from the Flow-GRPO github: https://github.com/yifan123/flow_grpo for SDE injection for WAN2.1. The variable names are changed since I hope that makes it easier to follow the blog post entirely.
 
 ```python
 
@@ -256,6 +259,22 @@ So this is basically exactly the implementation of what we derived above. If you
 </figure>
 
 What effects this has and what to best set here is an open question to me.
+
+For what it's worth, the square-root form is what everyone else seems to use. MixGRPO (https://github.com/Tencent-Hunyuan/MixGRPO), which is what HunyuanVideo 1.5 (https://arxiv.org/abs/2511.18870) uses for its I2V RLHF, keeps it with the same \(a = 0.7\), so the linear ramp really is the odd one out here. A detail I liked: `sigmas[1]` shows up in both, but in the square-root implementations it is only a guard against dividing by zero at \(\tau = 1\), while the Wan path reuses it as the slope of the ramp.
+
+### The Euler step injects too much noise
+
+Something I noticed while looking at this: the first-order step discretizes the variance as well as the drift, and it does so in a way that is biased rather than just imprecise. Over one step the SDE accumulates variance \(\int g(s)^2 ds\), but we use \(g(\tau)^2\lvert\Delta \tau\rvert\), which evaluates \(g\) at the start of the step. Denoising means stepping from \(\tau\) down to \(\tau_{\mathrm{next}}\), and \(g\) is increasing, so that is the largest value anywhere on the interval and every single step injects more noise than the SDE it is meant to be simulating.
+
+For the paper's \(g\) the exact version is not much harder, since
+
+\[
+\int_{\tau_{\mathrm{next}}}^{\tau}\frac{s}{1-s}\,ds
+=
+\log\frac{1-\tau_{\mathrm{next}}}{1-\tau}-\lvert\Delta\tau\rvert .
+\]
+
+On the 20-step schedule from the plot the Euler version is about 22% too much standard deviation on the first step, 5-6% through the middle, and 43% on the last one. The marginal-matching argument that justified swapping the ODE for the SDE holds in continuous time, so at these step counts the rollouts are noisier than that argument promises, and systematically so. It is really the same complaint as point 3 below, just sitting in the noise term instead of the drift, and it is worst at the low-noise end where the log-probabilities are already the most fragile (point 5).
 
 ## Limitations for Flow-GRPO
 1. Speed: Injecting SDEs everywhere requires to store all the logprobs and training across the full trajectory. Flow-GRPO-Fast would be one approach to solve this by just injecting SDEs into less transitions. Diffusion-NFT (https://arxiv.org/abs/2509.16117) is also an interesting read about convergence speed.
