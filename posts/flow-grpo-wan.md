@@ -50,7 +50,7 @@ v - v_\theta(x_\tau,\tau)
 \]
 
 ## GRPO
-You're probably familiar with the DeepSeekMath paper and how it popularised a way to train reasoning models for math etc. with reinforcement learning on top of LLMs. If you managed to put off reading the paper until now, this is a quick overview (if you really haven't read it, skip this blog post and go read it instead). For policy gradient methods in reinforcement learning you usually have an actor and a critic, like for Proximal Policy Optimisation (PPO). However, training the critic requires the additional critic model and its training, which can be prohibitively expensive for large models. Group Relative Policy Optimisation (GRPO) avoids training a critic by sampling some G policy rollouts from the same starting point and computing the relative advantage between them to judge which of these rollouts were better and which ones were worse:
+You're probably familiar with the DeepSeekMath paper and how it popularised a way to train reasoning models for math etc. with reinforcement learning on top of LLMs. If you managed to put off reading the paper until now, this is a quick overview (if you really haven't read it, it might be more interesting than this blog post?). For policy gradient methods in reinforcement learning you usually have an actor and a critic, like for Proximal Policy Optimisation (PPO). However, training the critic requires the additional critic model and its training, which can be prohibitively expensive for large models. Group Relative Policy Optimisation (GRPO) avoids training a critic by sampling some G policy rollouts from the same starting point and computing the relative advantage between them to judge which of these rollouts were better and which ones were worse:
 \[
 \hat{A}^i
 =
@@ -112,7 +112,7 @@ You can reformulate the flow-matching denoising process as an MDP, where \(t\) i
 
 <!-- Also, calculating \(r_t\) requires the ratio between the likelihood of an action under the new and old policies. Additionally, any RL algorithm needs sufficient exploration to reach strong policies (many sources, I could cite one here). -->
 
-To solve this mismatch, the authors in Flow-GRPO (cite) propose substituting the ODE at inference time with an SDE that matches the marginal probability density of the original ODE, meaning at a fixed noise level the distribution over particles is the same, while individual particles will naturally move differently due to the injected noise.
+To solve this mismatch, the authors in Flow-GRPO (https://arxiv.org/abs/2505.05470) propose substituting the ODE during training rollouts with an SDE. With the correct score and the same initial distribution, this construction exactly preserves the ODE’s marginal probability densities in continuous time: at a fixed noise level, the distribution over particles is the same, while individual trajectories differ due to the injected noise.
 
 The basic Flow-ODE is
 \[
@@ -150,7 +150,15 @@ Using the interpolation equation gives
 \nabla_{x_\tau}\log p_\tau(x_\tau \mid x_0) = -\frac{x_1}{\tau}.
 \]
 
-The interpolation also gives \(x_1 = x_\tau + (1-\tau)v\), which is what makes the score computable from \(v_\theta\). We can marginalize over \(x_0\), discretize and obtain
+The interpolation also gives \(x_1 = x_\tau + (1-\tau)v\). Marginalizing over \(x_0\) gives
+
+\[
+\nabla_x\log p_\tau(x)
+=
+-\frac{x+(1-\tau)\,\mathbb E[x_1-x_0\mid x_\tau=x]}{\tau}.
+\]
+
+The learned velocity \(v_\theta(x,\tau)\) approximates this conditional expectation. Substituting it into the score and discretizing with Euler–Maruyama gives
 
 \[
 x_{\tau+\Delta \tau}
@@ -169,8 +177,6 @@ x_\tau+(1-\tau)v_\theta(x_\tau,\tau)
 g(\tau)\sqrt{|\Delta \tau|}\epsilon
 \]
 
-NOTE: Mark transition mean
-
 with
 
 \[
@@ -178,7 +184,7 @@ with
 \]
 
 You can find interesting ablations about the hyperparameter a in the Flow-GRPO paper. Mainly, a can somewhat drive the exploration process in this formulation since it decides how much noise to add. 
-Since the SDE transition is Gaussian,
+The Euler–Maruyama transition is Gaussian.
 
 \[
 \pi_\theta(x_{\tau+\Delta \tau}\mid x_\tau,c)
@@ -190,7 +196,7 @@ g(\tau)^2|\Delta \tau|I
 \right),
 \]
 
-we can calculate the KL divergence term in closed form. The policy and reference model have the same transition variance, so
+We can calculate the KL divergence term in closed form. The policy and reference model have the same transition variance, so
 
 \[
 D_{\mathrm{KL}}(\pi_\theta\|\pi_{\mathrm{ref}})
@@ -228,22 +234,20 @@ for _, tau in enumerate(timesteps): # timesteps here are the amount of integrati
 We're looking at a code example from the Flow-GRPO github: https://github.com/yifan123/flow_grpo for SDE injection for WAN2.1. The variable names are changed since I hope that makes it easier to follow the blog post entirely.
 
 ```python
-
-class SDEScheduler():
-
+class SDEScheduler:
     def step(v_theta, timestep, latent):
-        tau = self.sigmas[step_index] # discussed below
+        tau = self.sigmas[step_index]  # discussed below
         tau_next = self.sigmas[step_index + 1]
-        
+
         d_tau = tau_next - tau
 
-        sigma_max = self.sigmas[1] # discussed below
-        sigma_min = self.sigmas[-1] # 0.0, the scheduler appends a zero terminal sigma
+        sigma_max = self.sigmas[1]  # discussed below
+        sigma_min = self.sigmas[-1]  # 0.0, the scheduler appends a zero terminal sigma
 
         g_tau = sigma_min + (sigma_max - sigma_min) * tau
 
-        mu_theta = (latent + (v_theta + g_tau**2 / (2 * tau) * (latent + (1 - tau) * v_theta))* d_tau)
-        
+        mu_theta = (latent + (v_theta + g_tau**2 / (2 * tau) * (latent + (1 - tau) * v_theta)) * d_tau)
+
         std_tau = g_tau * torch.sqrt(-d_tau)
 
         # During rollout we actually sample the next latent
@@ -251,22 +255,29 @@ class SDEScheduler():
             epsilon = torch.randn_like(latent)
             latent_next = mu_theta + std_tau * epsilon
 
-
         # Evaluate the log_prob under sampled transition
-        log_prob = (-(latent_next.detach() - mu_theta) ** 2 / (2 * std_tau**2) - torch.log(std_tau) - 0.5 * math.log(2 * math.pi))
+        log_prob = (
+            -((latent_next.detach() - mu_theta) ** 2) / (2 * std_tau**2)
+            - torch.log(std_tau)
+            - 0.5 * math.log(2 * math.pi)
+        )
 
         log_prob = log_prob.mean(dim=tuple(range(1, log_prob.ndim)))
 
+        if old_log_prob is not None:
+            policy_ratio = torch.exp(log_prob - old_log_prob)  # During training calculate the ratio
 ```
 
-So this is basically exactly the implementation of what we derived above. If you've read closely you'll find that g(tau) is just the linear interpolation here instead of the proposed a * sqrt(tau/(1-tau)). So the Wan2.1 Flow-GRPO implementation in the repo differs from the one in the paper. The square-root form is what the other implementations in the repo use use. MixGRPO (https://github.com/Tencent-Hunyuan/MixGRPO), which is what HunyuanVideo 1.5 (https://arxiv.org/abs/2511.18870) uses for its I2V RLHF, keeps the square-root form with the same \(a = 0.7\) as well. How this impacts the method performance is unclear to me, which is another way of saying I'm not compute rich enough right now to find out. If you let your agent implement Flow-GRPO for video model finetuning, it might be worth checking g(tau).
+So this is basically the implementation of what we derived above. If you've read closely you'll find two differences:
+1. g(tau) is just the linear interpolation here instead of the proposed a * sqrt(tau/(1-tau)). So the Wan2.1 Flow-GRPO implementation in the repo differs from the one in the paper. The square-root form is what most of the other implementations in the repo use. MixGRPO (https://github.com/Tencent-Hunyuan/MixGRPO), which is what HunyuanVideo 1.5 (https://arxiv.org/abs/2511.18870) uses for its I2V RLHF, keeps the square-root form with the same \(a = 0.7\) as well. 
+2. The ratio uses the mean over the latent dimension for the log probs, instead of the sum, which would be aligned with what we derived above. This is actually what all other implementations in the repo use as well and someone did ask about this in a github issue (#143), where the author mentions the sum would lead to instability even after adjusting clipping. To me, that would make sense if you have a very high-dimensional latent, you can be a bit more robust against small changes.
 
 
 ## Should you apply flow-grpo to your flow matching project?
-1. Speed: Injecting SDEs everywhere requires to store all the logprobs and training across the full trajectory. Flow-GRPO-Fast would be one approach to solve this by just injecting SDEs into less transitions. Diffusion-NFT (https://arxiv.org/abs/2509.16117) is also an interesting read about convergence speed. 
+1. Speed: During training, we need the current and next latent for each transition whose log-probability we re-evaluate under the updated policy. Storing these transitions can become expensive, especially for video models, although we only need to retain the transitions we intend to train on. You could inject noise only into some and for the rest use an ODE approach or restrict which transitions to train on (Flow-GRPO-Fast, DanceGRPO are a good starting point for these approaches). Additionally, RL rollouts are of course expensive (especially for video models or similar) and there's always a consideration about learning signal density (https://thinkingmachines.ai/blog/lora). 
 2. Inference Sampler: Wan2.1 uses multi-step solvers like the FlowUniPCMultistepScheduler at inference time, which increases inference speed and quality but is not directly compatible with what we derived above. These multistep solvers use information from previous model evaluations to provide a higher-order update to the denoising path, while we above focused on the first order Euler-Maruyama sampling approach. Using a multistep solver also complicates the Markovian assumption of the denoising path that we used above, since the update now additionally depends on previous states. If you want to have a fast sampler at inference time but still use Flow-GRPO first order discretisation for training, you need to be cautious of the train-inference mismatch you're introducing. 
-3. Tangential to the method but fundamental to the implementation of course: Verification. If you work with video models for example, verifiability of what makes a better video is tough, compared to coding or whatever RL environments people are running for llm agents right now. I really like the example [below](#dancegrpo-example) from the DanceGRPO paper, that basically shows you why all the AI generated images used to have this oily look for some time, a result of poor reward functions. Also, if you're looking at this example and feel like the original looks better than the RLed versions, I'd agree.
-4. Are you training robot policies? Many robot policies use a flow matching process to generate robot actions (pi05 etc.). Additionally, World Action Models (WAMs) are also mainly bootstrapped off of video generation backbones that use flow matching, which makes it an attractive thought to use some form of Flow-GRPO or other method on top. There is some previous work, such as pi-rl (https://arxiv.org/pdf/2510.25889), which does touch on these topics, but I haven't seen any strong execution at scale. Robotics does bring strong verifiability to these tasks because we can easily calculate successes/failures in simulation. However, how well Flow-GRPO behaves under this multi-step rollout process and whether the method is
+3. Tangential to the method but fundamental to the implementation of course: Verification. If you work with video models for example, verifiability of what makes a better video is tough, compared to coding or whatever RL environments people are running for llm agents right now. Below is the interesting example from the DanceGRPO paper, that shows how some of these oily looking images can be a result of poor reward functions. Also, if you're looking at this example and feel like the original looks better than the RLed versions, I'd agree.
+4. Are you training robot policies? Many robot policies use a flow matching process to generate robot actions (pi05 etc.). Additionally, World Action Models (WAMs) are also mainly bootstrapped off of video generation backbones that use flow matching, which makes it an attractive thought to use some form of Flow-GRPO or other method on top. There is some previous work, such as pi-rl (https://arxiv.org/pdf/2510.25889), which does touch on these topics, but I haven't seen any strong execution at scale. Robotics does bring strong verifiability to these tasks because we can easily calculate successes/failures in simulation. However, how well Flow-GRPO behaves under this multi-step rollout process and whether the method is a good fit for robotics in terms of effectivity and scalability, is still open.
 
 <figure id="dancegrpo-example" class="dancegrpo-comparison">
     <div class="dancegrpo-panels">
@@ -285,3 +296,5 @@ So this is basically exactly the implementation of what we derived above. If you
     </div>
     <figcaption>Reward optimisation changes the look of the generated image, for better or for worse? Prompt: “A dog with soft fur and bright eyes jumping after a toy, in a cozy living room.”<br><span class="figure-credit">Images from <a href="https://arxiv.org/abs/2505.07818">DanceGRPO: Unleashing GRPO on Visual Generation</a> (Zeyue Xue et al., 2025). Cropped; captions reformatted.</span></figcaption>
 </figure>
+
+I hope this short blog was somewhat informative and interesting to read. Shoot me a message if you want to talk more about these topics.
