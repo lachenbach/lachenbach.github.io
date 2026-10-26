@@ -184,7 +184,7 @@ with
 \epsilon \sim \mathcal{N}(0,I), \qquad g(\tau) = a\sqrt{\frac{\tau}{1-\tau}}
 \]
 
-You can find interesting ablations about the hyperparameter a in the Flow-GRPO paper. Mainly, a can somewhat drive the exploration process in this formulation since it decides how much noise to add. 
+You can find interesting ablations about the hyperparameter \(a\) in the Flow-GRPO paper. Mainly, \(a\) can somewhat drive the exploration process in this formulation since it decides how much noise to add. 
 The Euler–Maruyama transition is Gaussian.
 
 \[
