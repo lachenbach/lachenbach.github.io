@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Posts on robotics, imitation learning, and technical systems.">
-    <title>Liam | Posts</title>
+    <title>Liam | Home</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,13 +19,13 @@
             </div>
 
             <nav class="site-nav" aria-label="Primary navigation">
-                <a class="is-active" href="index.html">Posts</a>
+                <a class="is-active" href="index.html">Home</a>
                 <a href="finds.html">Finds</a>
                 <a href="experience.html">Experience</a>
             </nav>
         </header>
 
-        <main class="content">
+        <main class="content home-page">
             <section class="intro">
                 <div class="wave-lockup">
                     <div class="robot-scene">
@@ -34,15 +34,25 @@
                         </div>
                     </div>
                 </div>
+                <p class="home-introduction">I work on robot learning, including vision-language-action models, world action models, and agents.</p>
             </section>
 
-            <section class="post-list" aria-label="Featured posts">
+            <div class="home-sections">
+            <section class="home-section" aria-labelledby="papers-heading">
+                <h2 class="home-section-title" id="papers-heading">Papers</h2>
+                <p class="paper-entry"><a class="text-link" href="https://mimic-video.github.io/">mimic-video: Video-Action Models for Generalizable Robot Control Beyond VLAs</a></p>
+            </section>
+
+            <section class="home-section post-list" aria-labelledby="posts-heading">
+                <h2 class="home-section-title" id="posts-heading">Blog posts</h2>
                 <!-- POSTS:START -->
                 <article class="post-card">
-                    <h2><a class="post-row-link" href="flow-grpo-wan.html"><span>GRPO on flow matching models</span></a></h2>
+                    <h3><a class="post-row-link" href="flow-grpo-wan.html"><span>GRPO on flow matching models</span></a></h3>
                 </article>
                 <!-- POSTS:END -->
             </section>
+            <p class="home-experience"><a class="text-link" href="experience.html">More about my experience →</a></p>
+            </div>
         </main>
     </div>
 

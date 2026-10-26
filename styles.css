@@ -277,13 +277,13 @@ h2 {
     color: var(--ink-soft);
 }
 
-.post-card h2,
+.post-card h3,
 .note-card h2,
 .experience-card h2 {
     margin-bottom: 12px;
 }
 
-.post-card h2 {
+.post-card h3 {
     font-size: clamp(1.2rem, 2vw, 1.5rem);
     font-weight: 500;
     line-height: 1.4;
@@ -302,7 +302,7 @@ h2 {
     background: none;
 }
 
-.post-list .post-card h2 {
+.post-list .post-card h3 {
     margin: 0;
     font-size: clamp(1.1rem, 2vw, 1.3rem);
 }
@@ -320,6 +320,53 @@ h2 {
 .post-row-link:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 5px;
+}
+
+.home-introduction {
+    max-width: 38rem;
+    margin-top: 28px;
+    color: var(--ink-soft);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.home-sections {
+    display: grid;
+    gap: 36px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.home-section {
+    text-align: left;
+}
+
+.home-section-title {
+    margin-bottom: 12px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.82rem;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: var(--ink-soft);
+}
+
+.paper-entry,
+.home-section .post-card h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.65;
+    letter-spacing: 0;
+}
+
+.home-section .post-row-link {
+    padding: 0;
+}
+
+.home-experience {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.6;
 }
 
 .post-meta {
@@ -595,6 +642,41 @@ body:has(.blog-post) .site-header a {
     justify-content: flex-start;
     margin-top: 0;
     margin-bottom: 6px;
+}
+
+.experience-profile {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 36px;
+}
+
+.experience-portrait {
+    display: block;
+    width: 112px;
+    height: auto;
+    border-radius: 4px;
+}
+
+.experience-profile-copy .experience-links {
+    margin-top: 16px;
+    gap: 10px 20px;
+}
+
+.experience-profile-copy .experience-links a {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+}
+
+@media (max-width: 480px) {
+    .experience-profile {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
 }
 
 .experience-page .finds-note,

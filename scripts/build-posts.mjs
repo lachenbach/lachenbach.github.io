@@ -122,7 +122,7 @@ ${mathJaxScript}
             </div>
 
             <nav class="site-nav" aria-label="Primary navigation">
-                <a class="is-active" href="index.html">Posts</a>
+                <a class="is-active" href="index.html">Home</a>
                 <a href="finds.html">Finds</a>
                 <a href="experience.html">Experience</a>
             </nav>
@@ -146,7 +146,7 @@ ${post.htmlBody.trim()}
 
 function renderPostCard(post) {
     return `                <article class="post-card">
-                    <h2><a class="post-row-link" href="${post.slug}.html"><span>${escapeHtml(post.title)}</span></a></h2>
+                    <h3><a class="post-row-link" href="${post.slug}.html"><span>${escapeHtml(post.title)}</span></a></h3>
                 </article>`;
 }
 
