@@ -77,7 +77,7 @@ v - v_\theta(x_\tau,\tau)
 \right]
 \]</p>
 <h2>GRPO</h2>
-<p>You&#39;re probably familiar with the DeepSeekMath paper and how it popularised a way to train reasoning models for math etc. with reinforcement learning on top of LLMs. If you managed to put off reading the paper until now, this is a quick overview (if you really haven&#39;t read it, it might be more interesting than this blog post?). For policy gradient methods in reinforcement learning you usually have an actor and a critic, like for Proximal Policy Optimisation (PPO). However, training the critic requires the additional critic model and its training, which can be prohibitively expensive for large models. Group Relative Policy Optimisation (GRPO) avoids training a critic by sampling some G policy rollouts from the same starting point and computing the relative advantage between them to judge which of these rollouts were better and which ones were worse:
+<p>You&#39;re probably familiar with the DeepSeekMath paper and how it popularised a way to train reasoning models for math etc. with reinforcement learning on top of LLMs. If you managed to put off reading the paper until now, this is a quick overview. For policy gradient methods in reinforcement learning you usually have an actor and a critic, like for Proximal Policy Optimisation (PPO). However, training the critic requires the additional critic model and its training, which can be prohibitively expensive for large models. Group Relative Policy Optimisation (GRPO) avoids training a critic by sampling some G policy rollouts from the same starting point and computing the relative advantage between them to judge which of these rollouts were better and which ones were worse:
 \[
 \hat{A}^i
 =
