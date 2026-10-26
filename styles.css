@@ -78,7 +78,6 @@ a {
 }
 
 .brand,
-.brand-meta,
 .site-nav a,
 .post-meta,
 .section-kicker,
@@ -91,33 +90,6 @@ a {
     font-size: clamp(2rem, 3vw, 2.7rem);
     font-weight: 800;
     letter-spacing: -0.05em;
-}
-
-.brand-meta {
-    appearance: none;
-    -webkit-appearance: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    color: var(--ink-soft);
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    letter-spacing: normal;
-    white-space: pre;
-    border: 0;
-    border-radius: 0;
-    margin: 0;
-    padding: 0;
-    background: none;
-    cursor: pointer;
-    min-width: 5ch;
-    text-align: left;
-}
-
-.brand-meta:focus-visible {
-    outline: 1px solid currentColor;
-    outline-offset: 4px;
 }
 
 .site-nav {

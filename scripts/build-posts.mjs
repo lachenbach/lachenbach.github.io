@@ -118,7 +118,6 @@ ${mathJaxScript}
         <header class="site-header">
             <div class="brand-group">
                 <a class="brand" href="index.html">Liam</a>
-                <button class="brand-meta" type="button" aria-label="Reveal letters">73|76</button>
             </div>
 
             <nav class="site-nav" aria-label="Primary navigation">
