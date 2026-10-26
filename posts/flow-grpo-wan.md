@@ -32,11 +32,12 @@ I'm curious about this myself so this is a place where I document my learning ab
 ## Flow matching
 A short overview again on flow matching, we'll stick with this notation throughout the blog post. The core idea of flow matching is to learn a transform from noise to the clean data distribution. With sufficient training this can function as a generative model at inference, producing anything from images, AI-slop videos to robot actions. Stepping from one noisy latent to the next less noisy latent during flow matching inference is a deterministic process, which will come back to bite us in a few paragraphs.
 
-Sample from the data distribution: \(x_0 \sim X_0\)
-Noise sample: \(x_1 \sim X_1\)
-Rectified flow: \(x_\tau = (1-\tau)x_0 + \tau x_1\)
-Flow matching timestep: \(\tau \in [0,1]\)
+Sample from the data distribution: \(x_0 \sim X_0\)<br>
+Noise sample: \(x_1 \sim X_1\)<br>
+Rectified flow: \(x_\tau = (1-\tau)x_0 + \tau x_1\)<br>
+Flow matching timestep: \(\tau \in [0,1]\)<br>
 Velocity field (the vector pointing from data distribution sample to noise sample): \(v = x_1 - x_0\)
+
 Flow matching objective:
 \[
 \mathcal{L}(\theta)
@@ -50,7 +51,7 @@ v - v_\theta(x_\tau,\tau)
 \]
 
 ## GRPO
-You're probably familiar with the DeepSeekMath paper and how it popularised a way to train reasoning models for math etc. with reinforcement learning on top of LLMs. If you managed to put off reading the paper until now, this is a quick overview (if you really haven't read it, it might be more interesting than this blog post?). For policy gradient methods in reinforcement learning you usually have an actor and a critic, like for Proximal Policy Optimisation (PPO). However, training the critic requires the additional critic model and its training, which can be prohibitively expensive for large models. Group Relative Policy Optimisation (GRPO) avoids training a critic by sampling some G policy rollouts from the same starting point and computing the relative advantage between them to judge which of these rollouts were better and which ones were worse:
+You're probably familiar with the DeepSeekMath paper and how it popularised a way to train reasoning models for math etc. with reinforcement learning on top of LLMs. If you managed to put off reading the paper until now, this is a quick overview. For policy gradient methods in reinforcement learning you usually have an actor and a critic, like for Proximal Policy Optimisation (PPO). However, training the critic requires the additional critic model and its training, which can be prohibitively expensive for large models. Group Relative Policy Optimisation (GRPO) avoids training a critic by sampling some G policy rollouts from the same starting point and computing the relative advantage between them to judge which of these rollouts were better and which ones were worse:
 \[
 \hat{A}^i
 =
