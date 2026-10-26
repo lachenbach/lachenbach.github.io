@@ -652,6 +652,40 @@ body:has(.blog-post) .site-header a {
     margin-bottom: 36px;
 }
 
+.experience-current-entry {
+    padding: 16px 0 24px;
+}
+
+.experience-art-label h2,
+.experience-history-entry h2 {
+    margin-bottom: 6px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0;
+}
+
+.experience-art-label p,
+.experience-history-entry p {
+    color: var(--ink-soft);
+    font-size: 0.94rem;
+    line-height: 1.6;
+}
+
+.experience-history {
+    display: grid;
+    gap: 28px;
+    padding-top: 16px;
+}
+
+.experience-history-entry {
+    max-width: 42rem;
+}
+
+.experience-history-entry p + p {
+    margin-top: 8px;
+}
+
 .experience-portrait {
     display: block;
     width: 112px;
