@@ -138,6 +138,7 @@ ${post.htmlBody.trim()}
         </main>
     </div>
     <script type="module" src="script.js"></script>
+    <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6ea152fdb9ab42df934214bb97b77397"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
 `;
