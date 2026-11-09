@@ -338,6 +338,10 @@ h2 {
     letter-spacing: 0;
 }
 
+.paper-entry + .paper-entry {
+    margin-top: 16px;
+}
+
 .home-section .post-row-link {
     padding: 0;
 }
@@ -680,6 +684,7 @@ body:has(.blog-post) .site-header a {
     max-width: 42rem;
 }
 
+.experience-art-label p + p,
 .experience-history-entry p + p {
     margin-top: 8px;
 }
